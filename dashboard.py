@@ -16,10 +16,11 @@ class StockAnalysisDashboard:
         st.sidebar.header("Configuration")
 
 
-    def fetch_stock_data(self, ticker, start_date, end_date=None):
+    def fetch_stock_data(self, ticker, start_date, end_date):
         """Fetches stock data using yfinance and stores it in session state."""
-        client = StockApiClient(ticker=ticker, date=start_date)
-        data = client.get_data()
+        client = StockApiClient(ticker=ticker, start_date=start_date, end_date=end_date)
+        # data = client.get_data()
+        data = pd.read_csv("test_data.csv", index_col="date").loc[start_date:end_date]
         st.session_state["stock_data"] = data
         st.success("Stock data loaded successfully!")
         
@@ -38,6 +39,7 @@ class StockAnalysisDashboard:
                 name="Candlestick"
             )
         ])
+
         return fig
 
 
@@ -98,8 +100,8 @@ class StockAnalysisDashboard:
     def run(self):
         # Sidebar inputs for ticker and date range
         ticker = st.sidebar.text_input("Enter Stock Ticker (e.g., AAPL):", "AAPL")
-        start_date = st.sidebar.date_input("Start Date", value=pd.to_datetime("2023-01-01"))
-        end_date = st.sidebar.date_input("End Date", value=pd.to_datetime("2024-12-14"))
+        end_date = str(st.sidebar.date_input("Start Date", value=pd.to_datetime("2023-01-01")))
+        start_date = str(st.sidebar.date_input("End Date", value=pd.to_datetime("2024-12-14")))
 
         # Fetch data when button is pressed
         if st.sidebar.button("Fetch Data"):
@@ -108,7 +110,6 @@ class StockAnalysisDashboard:
         # Proceed if stock data is available in session state
         if "stock_data" in st.session_state:
             data = st.session_state["stock_data"]
-            print(data)  # This will print to the server console
 
             # Build the initial candlestick chart
             fig = self.build_candlestick_chart(data)
@@ -122,13 +123,13 @@ class StockAnalysisDashboard:
             )
 
             # Add each selected indicator to the chart
-            for indicator in indicators:
-                self.add_indicator(fig, data, indicator)
+            # for indicator in indicators:
+            #     self.add_indicator(fig, data, indicator)
 
             fig.update_layout(xaxis_rangeslider_visible=False)
             st.plotly_chart(fig)
 
-            # AI Analysis Section
-            st.subheader("AI-Powered Analysis")
-            if st.button("Run AI Analysis"):
-                self.run_ai_analysis(fig)
+            # # AI Analysis Section
+            # st.subheader("AI-Powered Analysis")
+            # if st.button("Run AI Analysis"):
+            #     self.run_ai_analysis(fig)

@@ -12,11 +12,12 @@ class StockApiClient:
 	_api_token = os.getenv("API_TOKEN")
 
 
-	def __init__(self, ticker, start_date, output_size="full", function="TIME_SERIES_DAILY"):
+	def __init__(self, ticker, start_date, end_date, output_size="full", function="TIME_SERIES_DAILY"):
 		self.ticker = ticker
 		self.function = function
 		self.output_size = output_size
 		self.start_date = start_date
+		self.end_date = end_date
 		self.url = self._base_url + function + "&symbol=" + ticker + "&outputsize=" + self.output_size + "&apikey=" + self._api_token
 
 
@@ -33,9 +34,4 @@ class StockApiClient:
 		df.columns = ["open", "high", "low", "close", "volume"]
 		df.index.name = "date"
 
-		return df.loc[:self.start_date]
-
-
-# client = StockApiClient("IBM", "2017-11-02")
-# data = client.get_data()
-# print(data)
+		return df.loc[self.end_date:self.start_date]
