@@ -6,6 +6,7 @@ import ollama
 import tempfile
 import base64
 import os
+from stock_api import StockApiClient
 
 
 class StockAnalysisDashboard:
@@ -15,11 +16,13 @@ class StockAnalysisDashboard:
         st.sidebar.header("Configuration")
 
 
-    def fetch_stock_data(self, ticker, start_date, end_date):
+    def fetch_stock_data(self, ticker, start_date, end_date=None):
         """Fetches stock data using yfinance and stores it in session state."""
-        data = yf.download(ticker, start=start_date, end=end_date)
+        client = StockApiClient(ticker=ticker, date=start_date)
+        data = client.get_data()
         st.session_state["stock_data"] = data
         st.success("Stock data loaded successfully!")
+        
         return data
 
 
@@ -28,10 +31,10 @@ class StockAnalysisDashboard:
         fig = go.Figure(data=[
             go.Candlestick(
                 x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'],
+                open=data['open'],
+                high=data['high'],
+                low=data['low'],
+                close=data['close'],
                 name="Candlestick"
             )
         ])

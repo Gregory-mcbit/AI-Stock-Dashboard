@@ -1,6 +1,7 @@
 import os
 import dotenv
 import requests
+import pandas as pd
 
 
 dotenv.load_dotenv(".env")
@@ -11,17 +12,30 @@ class StockApiClient:
 	_api_token = os.getenv("API_TOKEN")
 
 
-	def __init__(self, ticker, date, function="HISTORICAL_OPTIONS"):
+	def __init__(self, ticker, start_date, output_size="full", function="TIME_SERIES_DAILY"):
 		self.ticker = ticker
 		self.function = function
-		self.date = date
-		self.url = self._base_url + function + "&symbol=" + ticker + "&date=" + self.date + "&apikey=" + self._api_token
-	
-	
+		self.output_size = output_size
+		self.start_date = start_date
+		self.url = self._base_url + function + "&symbol=" + ticker + "&outputsize=" + self.output_size + "&apikey=" + self._api_token
+
+
 	def get_data(self):
-		data = requests.get(self.url).json()
-		return data
+		self.data = requests.get(self.url).json()
+		result = self._data_preprocessing()
+
+		return result
 
 
-client = StockApiClient("IBM", "2017-11-02")
-print(client.get_data())
+	def _data_preprocessing(self):
+		df = pd.DataFrame(self.data["Time Series (Daily)"])
+		df = df.T
+		df.columns = ["open", "high", "low", "close", "volume"]
+		df.index.name = "date"
+
+		return df.loc[:self.start_date]
+
+
+# client = StockApiClient("IBM", "2017-11-02")
+# data = client.get_data()
+# print(data)
