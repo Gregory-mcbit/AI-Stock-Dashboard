@@ -46,20 +46,23 @@ class StockAnalysisDashboard:
     def add_indicator(self, fig, data, indicator):
         """Adds a technical indicator to the chart based on user selection."""
         if indicator == "20-Day SMA":
-            sma = data['Close'].rolling(window=20).mean()
+            sma = data['close'].rolling(window=20).mean()
             fig.add_trace(go.Scatter(x=data.index, y=sma, mode='lines', name='SMA (20)'))
+
         elif indicator == "20-Day EMA":
-            ema = data['Close'].ewm(span=20).mean()
+            ema = data['close'].ewm(span=20).mean()
             fig.add_trace(go.Scatter(x=data.index, y=ema, mode='lines', name='EMA (20)'))
+
         elif indicator == "20-Day Bollinger Bands":
-            sma = data['Close'].rolling(window=20).mean()
-            std = data['Close'].rolling(window=20).std()
+            sma = data['close'].rolling(window=20).mean()
+            std = data['close'].rolling(window=20).std()
             bb_upper = sma + 2 * std
             bb_lower = sma - 2 * std
             fig.add_trace(go.Scatter(x=data.index, y=bb_upper, mode='lines', name='BB Upper'))
             fig.add_trace(go.Scatter(x=data.index, y=bb_lower, mode='lines', name='BB Lower'))
+
         elif indicator == "VWAP":
-            data['VWAP'] = (data['Close'] * data['Volume']).cumsum() / data['Volume'].cumsum()
+            data['VWAP'] = (data['close'] * data['volume']).cumsum() / data['volume'].cumsum()
             fig.add_trace(go.Scatter(x=data.index, y=data['VWAP'], mode='lines', name='VWAP'))
 
 
@@ -123,8 +126,8 @@ class StockAnalysisDashboard:
             )
 
             # Add each selected indicator to the chart
-            # for indicator in indicators:
-            #     self.add_indicator(fig, data, indicator)
+            for indicator in indicators:
+                self.add_indicator(fig, data, indicator)
 
             fig.update_layout(xaxis_rangeslider_visible=False)
             st.plotly_chart(fig)
