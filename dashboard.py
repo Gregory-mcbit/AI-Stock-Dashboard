@@ -19,8 +19,7 @@ class StockAnalysisDashboard:
     def fetch_stock_data(self, ticker, start_date, end_date):
         """Fetches stock data using yfinance and stores it in session state."""
         client = StockApiClient(ticker=ticker, start_date=start_date, end_date=end_date)
-        # data = client.get_data()
-        data = pd.read_csv("test_data.csv", index_col="date").loc[start_date:end_date]
+        data = client.get_data()
         st.session_state["stock_data"] = data
         st.success("Stock data loaded successfully!")
         
@@ -60,10 +59,6 @@ class StockAnalysisDashboard:
             bb_lower = sma - 2 * std
             fig.add_trace(go.Scatter(x=data.index, y=bb_upper, mode='lines', name='BB Upper'))
             fig.add_trace(go.Scatter(x=data.index, y=bb_lower, mode='lines', name='BB Lower'))
-
-        elif indicator == "VWAP":
-            data['VWAP'] = (data['close'] * data['volume']).cumsum() / data['volume'].cumsum()
-            fig.add_trace(go.Scatter(x=data.index, y=data['VWAP'], mode='lines', name='VWAP'))
 
 
     def run_ai_analysis(self, fig):
@@ -121,7 +116,7 @@ class StockAnalysisDashboard:
             st.sidebar.subheader("Technical Indicators")
             indicators = st.sidebar.multiselect(
                 "Select Indicators:",
-                ["20-Day SMA", "20-Day EMA", "20-Day Bollinger Bands", "VWAP"],
+                ["20-Day SMA", "20-Day EMA", "20-Day Bollinger Bands"],
                 default=["20-Day SMA"]
             )
 

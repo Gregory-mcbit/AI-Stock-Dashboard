@@ -34,4 +34,4 @@ class StockApiClient:
 		df.columns = ["open", "high", "low", "close", "volume"]
 		df.index.name = "date"
 
-		return df.loc[self.end_date:self.start_date]
+		return df.loc[self.start_date:self.end_date]
