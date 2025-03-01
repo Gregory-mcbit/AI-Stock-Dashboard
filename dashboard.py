@@ -133,6 +133,6 @@ class StockAnalysisDashboard:
             st.plotly_chart(fig)
 
             # # AI Analysis Section
-            # st.subheader("AI-Powered Analysis")
-            # if st.button("Run AI Analysis"):
-            #     self.run_ai_analysis(fig)
+            st.subheader("AI-Powered Analysis")
+            if st.button("Run AI Analysis"):
+                self.run_ai_analysis(fig)
